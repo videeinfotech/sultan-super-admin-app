@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SuperAdminView } from '../../types';
+import { SuperAdminView } from '../../types.ts';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 
 interface Props {

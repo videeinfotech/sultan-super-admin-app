@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SuperAdminView } from '../../types';
+import { SuperAdminView } from '../../types.ts';
 import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 interface Props {
@@ -51,7 +51,6 @@ const SuperAdminDashboard: React.FC<Props> = ({ onNavigate }) => {
       </header>
 
       <main className="p-4 space-y-4 pb-24">
-        {/* KPI Section */}
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2 flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-gray-800 border border-[#dbdfe6] dark:border-gray-700 shadow-sm">
             <div className="flex justify-between items-start">
@@ -76,7 +75,6 @@ const SuperAdminDashboard: React.FC<Props> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Sales Trend Chart */}
         <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-5 rounded-xl border border-[#dbdfe6] dark:border-gray-700 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
@@ -102,7 +100,6 @@ const SuperAdminDashboard: React.FC<Props> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Monitoring Modules */}
         <section>
           <h3 className="text-base font-bold mb-4 px-1">Monitoring Modules</h3>
           <div className="grid grid-cols-2 gap-4">

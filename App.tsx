@@ -1,19 +1,19 @@
 
 import React, { useState } from 'react';
-import { AppType, SuperAdminView } from './types';
-import SuperAdminLogin from './components/super-admin/SuperAdminLogin';
-import SuperAdminDashboard from './components/super-admin/SuperAdminDashboard';
-import SuperAdminInventory from './components/super-admin/SuperAdminInventory';
-import SuperAdminProductDetail from './components/super-admin/SuperAdminProductDetail';
-import SuperAdminOrders from './components/super-admin/SuperAdminOrders';
-import SuperAdminOrderDetail from './components/super-admin/SuperAdminOrderDetail';
-import SuperAdminAnalytics from './components/super-admin/SuperAdminAnalytics';
-import SuperAdminStoreDirectory from './components/super-admin/SuperAdminStoreDirectory';
-import SuperAdminProfile from './components/super-admin/SuperAdminProfile';
-import StoreAdminInsight from './components/super-admin/StoreAdminInsight';
-import StoreAdminStock from './components/super-admin/StoreAdminStock';
-import StoreAdminStaff from './components/super-admin/StoreAdminStaff';
-import StoreAdminSettings from './components/super-admin/StoreAdminSettings';
+import { AppType, SuperAdminView } from './types.ts';
+import SuperAdminLogin from './components/super-admin/SuperAdminLogin.tsx';
+import SuperAdminDashboard from './components/super-admin/SuperAdminDashboard.tsx';
+import SuperAdminInventory from './components/super-admin/SuperAdminInventory.tsx';
+import SuperAdminProductDetail from './components/super-admin/SuperAdminProductDetail.tsx';
+import SuperAdminOrders from './components/super-admin/SuperAdminOrders.tsx';
+import SuperAdminOrderDetail from './components/super-admin/SuperAdminOrderDetail.tsx';
+import SuperAdminAnalytics from './components/super-admin/SuperAdminAnalytics.tsx';
+import SuperAdminStoreDirectory from './components/super-admin/SuperAdminStoreDirectory.tsx';
+import SuperAdminProfile from './components/super-admin/SuperAdminProfile.tsx';
+import StoreAdminInsight from './components/super-admin/StoreAdminInsight.tsx';
+import StoreAdminStock from './components/super-admin/StoreAdminStock.tsx';
+import StoreAdminStaff from './components/super-admin/StoreAdminStaff.tsx';
+import StoreAdminSettings from './components/super-admin/StoreAdminSettings.tsx';
 
 const App: React.FC = () => {
   const [appType, setAppType] = useState<AppType>('auth');

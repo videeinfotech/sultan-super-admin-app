@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SuperAdminView, Order } from '../../types';
+import { SuperAdminView, Order } from '../../types.ts';
 
 interface Props {
   onNavigate: (view: SuperAdminView, id?: string) => void;
