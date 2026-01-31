@@ -1,19 +1,41 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SuperAdminView, Order } from '../../types.ts';
+import { superAdminApi } from '../../api.ts';
 
 interface Props {
   onNavigate: (view: SuperAdminView, id?: string) => void;
 }
 
-const mockOrders: Order[] = [
-  { id: 'ORD-9421', customer: 'Sarah Jenkins', store: 'Central Mall - Flagship', amount: 492, status: 'Completed', timestamp: '2 mins ago' },
-  { id: 'ORD-9420', customer: 'Michael Ross', store: 'Downtown Boutique', amount: 1205.50, status: 'Pending', timestamp: '15 mins ago' },
-  { id: 'ORD-9419', customer: 'David Chen', store: 'Airport Terminal 3', amount: 89, status: 'In Transit', timestamp: '1 hour ago' },
-  { id: 'ORD-9418', customer: 'Emma Watson', store: 'Westside Outlet', amount: 215.75, status: 'Refunded', timestamp: '2 hours ago' },
-];
-
 const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const [ordersRes, dashboardRes] = await Promise.all([
+          superAdminApi.getOrders(),
+          superAdminApi.getDashboard('?period=today')
+        ]);
+
+        if (ordersRes.success) {
+          setOrders(ordersRes.data);
+        }
+        if (dashboardRes.success) {
+          setStats(dashboardRes.data.stats);
+        }
+      } catch (err) {
+        console.error('Failed to fetch global orders', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
   return (
     <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto pb-20">
       <header className="sticky top-0 z-50 bg-white dark:bg-background-dark border-b border-[#dbdfe6] dark:border-gray-800">
@@ -30,13 +52,17 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
         <div className="flex gap-3">
           <div className="flex-1 p-4 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm">
             <p className="text-xs font-semibold text-[#616f89] uppercase">Total Orders</p>
-            <p className="text-2xl font-bold">1,284</p>
-            <p className="text-xs text-emerald-600 font-bold mt-1">+12.5%</p>
+            <p className="text-2xl font-bold">{stats?.total_orders?.toLocaleString() || '...'}</p>
+            <p className={`text-xs font-bold mt-1 ${stats?.orders_change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+              {stats?.orders_change >= 0 ? '+' : ''}{stats?.orders_change}%
+            </p>
           </div>
           <div className="flex-1 p-4 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm">
             <p className="text-xs font-semibold text-[#616f89] uppercase">Total Revenue</p>
-            <p className="text-2xl font-bold">$42,500</p>
-            <p className="text-xs text-emerald-600 font-bold mt-1">+8.2%</p>
+            <p className="text-2xl font-bold">${stats?.total_revenue?.toLocaleString() || '...'}</p>
+            <p className={`text-xs font-bold mt-1 ${stats?.revenue_change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+              {stats?.revenue_change >= 0 ? '+' : ''}{stats?.revenue_change}%
+            </p>
           </div>
         </div>
 
@@ -45,41 +71,52 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
           <span className="text-xs font-semibold text-primary uppercase">Live Updates</span>
         </div>
 
-        <div className="space-y-3">
-          {mockOrders.map(order => (
-            <div 
-              key={order.id}
-              onClick={() => onNavigate('order-detail', order.id)}
-              className="p-4 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm active:scale-[0.98] transition-transform cursor-pointer"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-bold text-[#616f89] uppercase">#{order.id}</p>
-                  <p className="text-xs text-[#616f89]">{order.timestamp}</p>
+        {loading ? (
+          <div className="flex justify-center p-12">
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {orders.length === 0 ? (
+              <div className="text-center p-12 bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700">
+                <p className="text-gray-400">No orders found</p>
+              </div>
+            ) : (
+              orders.map(order => (
+                <div
+                  key={order.id}
+                  onClick={() => onNavigate('order-detail', order.id)}
+                  className="p-4 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm active:scale-[0.98] transition-transform cursor-pointer hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs font-bold text-[#616f89] uppercase">#{order.id}</p>
+                      <p className="text-xs text-[#616f89]">{order.timestamp}</p>
+                    </div>
+                    <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${['Completed', 'Delivered'].includes(order.status) ? 'bg-emerald-100 text-emerald-700' :
+                        ['Pending', 'Confirmed'].includes(order.status) ? 'bg-amber-100 text-amber-700' :
+                          ['In Transit', 'Out for Delivery'].includes(order.status) ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-100 text-gray-700'
+                      }`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <p className="text-sm font-bold">{order.store}</p>
+                    <p className="text-sm text-[#616f89]">Customer: {order.customer}</p>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 mt-2 border-t dark:border-gray-800">
+                    <p className="text-lg font-extrabold text-primary">${typeof order.amount === 'number' ? order.amount.toFixed(2) : order.amount}</p>
+                    <div className="flex items-center text-[#616f89]">
+                      <span className="text-xs font-medium mr-1">View Details</span>
+                      <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                    </div>
+                  </div>
                 </div>
-                <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${
-                  order.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
-                  order.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
-                  order.status === 'In Transit' ? 'bg-blue-100 text-blue-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
-                  {order.status}
-                </span>
-              </div>
-              <div className="mt-3">
-                <p className="text-sm font-bold">{order.store}</p>
-                <p className="text-sm text-[#616f89]">Customer: {order.customer}</p>
-              </div>
-              <div className="flex justify-between items-center pt-2 mt-2 border-t dark:border-gray-800">
-                <p className="text-lg font-extrabold text-primary">${order.amount.toFixed(2)}</p>
-                <div className="flex items-center text-[#616f89]">
-                  <span className="text-xs font-medium mr-1">View Details</span>
-                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              ))
+            )}
+          </div>
+        )}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 bg-white dark:bg-gray-900 border-t border-[#dbdfe6] dark:border-gray-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
