@@ -1,5 +1,5 @@
 
-const BASE_URL = 'http://localhost:8000/api/v1';
+const BASE_URL = 'https://sultan.quicdeal.in/api/v1';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('super_admin_token');
