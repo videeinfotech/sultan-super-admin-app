@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { StoreAdminView } from '../../types';
+import { formatPrice } from '../../api.ts';
 
 interface Props {
   onNavigate: (view: StoreAdminView) => void;
@@ -48,17 +49,16 @@ const StoreAdminStock: React.FC<Props> = ({ onNavigate }) => {
                 <div>
                   <p className="font-bold text-sm">{item.name}</p>
                   <p className="text-[10px] text-[#616f89] mt-0.5">SKU: {item.sku}</p>
-                  <span className={`text-[9px] font-black uppercase mt-1 inline-block ${
-                    item.status === 'In Stock' ? 'text-green-600' :
-                    item.status === 'Low Stock' ? 'text-orange-500' : 'text-red-500'
-                  }`}>
+                  <span className={`text-[9px] font-black uppercase mt-1 inline-block ${item.status === 'In Stock' ? 'text-green-600' :
+                      item.status === 'Low Stock' ? 'text-orange-500' : 'text-red-500'
+                    }`}>
                     {item.status}
                   </span>
                 </div>
               </div>
               <div className="text-right">
                 <p className={`text-lg font-extrabold ${item.qty === 0 ? 'text-red-500' : ''}`}>{item.qty}</p>
-                <p className="text-[10px] font-bold text-[#616f89] tracking-tighter">${item.price}</p>
+                <p className="text-[10px] font-bold text-[#616f89] tracking-tighter">{formatPrice(item.price)}</p>
               </div>
             </div>
           ))}

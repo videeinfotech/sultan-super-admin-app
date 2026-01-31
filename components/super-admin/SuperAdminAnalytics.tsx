@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { SuperAdminView } from '../../types.ts';
-import { superAdminApi } from '../../api.ts';
+import { superAdminApi, formatPrice } from '../../api.ts';
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from 'recharts';
 
 interface Props {
@@ -65,7 +65,7 @@ const SuperAdminAnalytics: React.FC<Props> = ({ onNavigate }) => {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2 rounded-xl p-4 bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-sm">
               <p className="text-gray-500 text-xs font-semibold uppercase">Total Sales</p>
-              <p className="text-xl font-bold">${stats.total_sales.toLocaleString()}</p>
+              <p className="text-xl font-bold">{formatPrice(stats.total_sales)}</p>
               <p className={`${stats.sales_change >= 0 ? 'text-[#07883b]' : 'text-red-500'} text-xs font-bold`}>
                 {stats.sales_change >= 0 ? '+' : ''}{stats.sales_change}% vs LW
               </p>
@@ -121,7 +121,7 @@ const SuperAdminAnalytics: React.FC<Props> = ({ onNavigate }) => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-sm">${store.revenue.toLocaleString()}</p>
+                      <p className="font-bold text-sm">{formatPrice(store.revenue)}</p>
                       <p className={`text-xs ${store.growth >= 0 ? 'text-[#07883b]' : 'text-red-500'}`}>
                         {store.growth >= 0 ? '+' : ''}{store.growth}%
                       </p>

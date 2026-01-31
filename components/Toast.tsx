@@ -8,7 +8,7 @@ interface ConfirmOptions {
 }
 
 interface ToastContextType {
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+    showToast: (type: 'success' | 'failed' | 'info', message: string) => void;
     confirm: (options: ConfirmOptions) => void;
 }
 
@@ -21,10 +21,10 @@ export const useToast = () => {
 };
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'failed' | 'info' } | null>(null);
     const [confirmData, setConfirmData] = useState<ConfirmOptions | null>(null);
 
-    const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const showToast = (type: 'success' | 'failed' | 'info', message: string) => {
         setToast({ message, type });
     };
 
@@ -43,18 +43,22 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         <ToastContext.Provider value={{ showToast, confirm }}>
             {children}
             {toast && (
-                <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-[400px] animate-in slide-in-from-top duration-300">
+                <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-[360px] animate-in slide-in-from-top duration-500 transition-all">
                     <div className={`
-                        px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 border
-                        ${toast.type === 'success' ? 'bg-green-500/90 border-green-400 text-white' :
-                            toast.type === 'error' ? 'bg-red-500/90 border-red-400 text-white' :
-                                'bg-gray-800/90 border-gray-700 text-white'}
+                        px-4 py-3 rounded-2xl shadow-xl backdrop-blur-xl flex items-center gap-3 border
+                        ${toast.type === 'success' ? 'bg-[#10b981]/90 border-[#34d399]/30 text-white' :
+                            toast.type === 'failed' ? 'bg-[#ef4444]/90 border-[#f87171]/30 text-white' :
+                                'bg-[#3b82f6]/90 border-[#60a5fa]/30 text-white'}
                     `}>
-                        <span className="material-symbols-outlined">
-                            {toast.type === 'success' ? 'check_circle' : toast.type === 'error' ? 'error' : 'info'}
-                        </span>
-                        <p className="text-sm font-bold flex-1">{toast.message}</p>
-                        <button onClick={() => setToast(null)} className="opacity-70 hover:opacity-100">
+                        <div className="size-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined !text-[20px]">
+                                {toast.type === 'success' ? 'verified' : toast.type === 'failed' ? 'dangerous' : 'info'}
+                            </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold leading-tight">{toast.message}</p>
+                        </div>
+                        <button onClick={() => setToast(null)} className="opacity-50 hover:opacity-100 transition-opacity">
                             <span className="material-symbols-outlined text-base">close</span>
                         </button>
                     </div>

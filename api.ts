@@ -1,15 +1,31 @@
 
-const BASE_URL = 'https://sultan.quicdeal.in/api/v1';
+export const formatPrice = (price: number | string) => {
+  const num = typeof price === 'string' ? parseFloat(price) : price;
+  return `₹${Math.round(num || 0).toLocaleString('en-IN')}`;
+};
+
+// Automatically detect if running locally or on production
+const isLocalhost = window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '[::1]';
+
+const BASE_URL = isLocalhost
+  ? 'http://localhost:8000/api/v1'
+  : 'https://sultan.quicdeal.in/api/v1';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('super_admin_token');
 
-  const headers = {
-    'Content-Type': 'application/json',
+  const headers: any = {
     'Accept': 'application/json',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...((options.headers as any) || {}),
   };
+
+  // Only set Content-Type if not FormData (Fetch automatically handles boundary for FormData)
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
@@ -37,12 +53,15 @@ export const superAdminApi = {
     method: 'POST',
     body: JSON.stringify(credentials),
   }),
-  getDashboard: () => apiFetch('/super-admin/dashboard'),
+  getDashboard: (params: string = '') => apiFetch(`/super-admin/dashboard${params}`),
   getProducts: (params: string = '') => apiFetch(`/super-admin/products${params}`),
   getOrders: (params: string = '') => apiFetch(`/super-admin/orders${params}`),
-  getStores: () => apiFetch('/super-admin/stores'),
+  getStores: (params: string = '') => apiFetch(`/super-admin/stores${params}`),
   getAnalytics: () => apiFetch('/super-admin/analytics'),
   getUser: () => apiFetch('/super-admin/user'),
+  updateProfile: (data: any) => apiFetch('/super-admin/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  updatePassword: (data: any) => apiFetch('/super-admin/password', { method: 'PUT', body: JSON.stringify(data) }),
+  updateAvatar: (formData: FormData) => apiFetch('/super-admin/avatar', { method: 'POST', body: formData }),
   getStore: (id: string) => apiFetch(`/super-admin/stores/${id}`),
   updateStore: (id: string, data: any) => apiFetch(`/super-admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   getOrder: (id: string) => apiFetch(`/super-admin/orders/${id}`),

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { SuperAdminView } from '../../types.ts';
-import { superAdminApi } from '../../api.ts';
+import { superAdminApi, formatPrice } from '../../api.ts';
 import { useToast } from '../Toast.tsx';
 
 interface Props {
@@ -69,11 +69,12 @@ const StoreAdminStock: React.FC<Props> = ({ onNavigate, storeId }) => {
       await superAdminApi.updateStoreStock(storeId, selectedProduct.id, qty);
       setShowModal(false);
       fetchStock();
+      showToast('success', 'Logistics Updated: Local stock levels synchronized.');
     } catch (err: any) {
       if (err.errors) {
         setFieldErrors(err.errors);
       } else {
-        showToast(err.message || 'Failed to update stock', 'error');
+        showToast('failed', err.message || 'Logistics Error: Unable to synchronize stock levels.');
       }
     }
   };
@@ -116,9 +117,9 @@ const StoreAdminStock: React.FC<Props> = ({ onNavigate, storeId }) => {
       setSelectedGlobalProduct(null);
       setAddQty(0);
       fetchStock();
-      showToast('Product added to store', 'success');
+      showToast('success', 'Asset Assigned: Product has been added to this store catalog.');
     } catch (err: any) {
-      showToast(err.message || 'Failed to add product', 'error');
+      showToast('failed', err.message || 'Inventory Error: Unable to finalize product assignment.');
     }
   };
 
@@ -188,7 +189,7 @@ const StoreAdminStock: React.FC<Props> = ({ onNavigate, storeId }) => {
                     </div>
                     <div className="text-right shrink-0">
                       <p className={`text-xl font-black ${item.qty === 0 ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>{item.qty}</p>
-                      <p className="text-[10px] font-black text-primary tracking-tighter">${item.price}</p>
+                      <p className="text-[10px] font-black text-primary tracking-tighter">{formatPrice(item.price)}</p>
                     </div>
                   </div>
                 ))

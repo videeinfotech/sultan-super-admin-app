@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { SuperAdminView } from '../../types.ts';
-import { superAdminApi } from '../../api.ts';
+import { superAdminApi, formatPrice } from '../../api.ts';
 
 interface Props {
   onNavigate: (view: SuperAdminView, id?: string) => void;
@@ -107,7 +107,7 @@ const StoreAdminInsight: React.FC<Props> = ({ onNavigate, onBack, storeId }) => 
         <div className="grid grid-cols-2 gap-3 p-4">
           <div className="p-5 border dark:border-gray-800 rounded-3xl space-y-2 bg-white dark:bg-gray-800 shadow-sm transition-transform hover:translate-y-[-2px]">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Revenue Today</p>
-            <p className="text-2xl font-black text-primary">${(stats.revenue || 0).toLocaleString()}</p>
+            <p className="text-2xl font-black text-primary">{formatPrice(stats.revenue || 0)}</p>
             <p className="text-[#07883b] text-xs font-bold flex items-center gap-1">
               <span className="material-symbols-outlined text-xs">trending_up</span> 12%
             </p>
@@ -168,9 +168,9 @@ const StoreAdminInsight: React.FC<Props> = ({ onNavigate, onBack, storeId }) => 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-black text-gray-900 dark:text-white">${item.total_amount.toLocaleString()}</p>
+                    <p className="text-sm font-black text-gray-900 dark:text-white">{formatPrice(item.total_amount)}</p>
                     <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg ${item.status === 'Completed' ? 'bg-green-100 text-green-600' :
-                        item.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
+                      item.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
                       }`}>{item.status}</span>
                   </div>
                 </div>

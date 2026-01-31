@@ -89,8 +89,8 @@ const SuperAdminInventory: React.FC<Props> = ({ onNavigate }) => {
                   <img src={product.imageUrl} className="size-20 rounded-lg object-cover bg-gray-50" alt={product.name} />
                   <div className="flex-1 min-w-0">
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${product.status === 'In Stock' ? 'bg-green-100 text-green-700' :
-                        product.status === 'Low Stock' ? 'bg-amber-100 text-amber-700' :
-                          'bg-red-100 text-red-700'
+                      product.status === 'Low Stock' ? 'bg-amber-100 text-amber-700' :
+                        'bg-red-100 text-red-700'
                       }`}>
                       {product.status}
                     </span>
@@ -115,7 +115,7 @@ const SuperAdminInventory: React.FC<Props> = ({ onNavigate }) => {
             <span className="text-[10px] font-bold uppercase tracking-tighter">Overview</span>
           </div>
           <div className="flex flex-col items-center gap-1 text-primary cursor-pointer" onClick={() => onNavigate('inventory')}>
-            <span className="material-symbols-outlined font-display">inventory_2</span>
+            <span className="material-symbols-outlined">inventory</span>
             <span className="text-[10px] font-bold uppercase tracking-tighter">Inventory</span>
           </div>
           <div className="flex flex-col items-center gap-1 text-gray-400 cursor-pointer" onClick={() => onNavigate('orders')}>

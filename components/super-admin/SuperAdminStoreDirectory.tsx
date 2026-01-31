@@ -15,7 +15,7 @@ const SuperAdminStoreDirectory: React.FC<Props> = ({ onNavigate }) => {
     const fetchStores = async () => {
       setLoading(true);
       try {
-        const res = await superAdminApi.getStores();
+        const res = await superAdminApi.getStores('?per_page=100');
         if (res.success) {
           setStores(res.data);
         }

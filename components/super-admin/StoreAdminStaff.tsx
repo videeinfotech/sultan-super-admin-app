@@ -50,12 +50,12 @@ const StoreAdminStaff: React.FC<Props> = ({ onNavigate, storeId }) => {
       setEditingStaff(null);
       setFormData({ name: '', email: '', role: 'SUB ADMIN', password: '' });
       fetchStaff();
-      showToast(editingStaff ? 'Staff updated' : 'Staff added', 'success');
+      showToast('success', editingStaff ? 'Team Synchronized: Staff member details updated.' : 'Access Granted: New staff member added to team.');
     } catch (err: any) {
       if (err.errors) {
         setFieldErrors(err.errors);
       } else {
-        showToast(err.message || 'Operation failed', 'error');
+        showToast('failed', err.message || 'Identity Error: Unable to finalize staff changes.');
       }
     }
   };
@@ -67,9 +67,9 @@ const StoreAdminStaff: React.FC<Props> = ({ onNavigate, storeId }) => {
         try {
           await superAdminApi.removeStaff(id);
           fetchStaff();
-          showToast('Staff member removed', 'success');
+          showToast('success', 'Registry Updated: Staff member has been removed.');
         } catch (err) {
-          showToast('Failed to delete staff', 'error');
+          showToast('failed', 'Critical Error: Unable to remove staff member from the database.');
         }
       }
     });

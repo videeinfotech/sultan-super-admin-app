@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { StoreAdminView } from '../../types';
+import { formatPrice } from '../../api.ts';
 
 interface Props {
   onNavigate: (view: StoreAdminView) => void;
@@ -68,7 +69,7 @@ const StoreAdminInsight: React.FC<Props> = ({ onNavigate, onLogout }) => {
         <div className="grid grid-cols-2 gap-3 p-4">
           <div className="p-4 border dark:border-gray-800 rounded-2xl space-y-1 bg-white dark:bg-gray-800/30">
             <p className="text-[#616f89] text-[10px] font-bold uppercase tracking-widest">Revenue</p>
-            <p className="text-2xl font-extrabold">$12,450</p>
+            <p className="text-2xl font-extrabold">{formatPrice(12450)}</p>
             <p className="text-[#07883b] text-xs font-bold flex items-center gap-1">
               <span className="material-symbols-outlined text-xs">trending_up</span> 12.4%
             </p>
@@ -120,7 +121,7 @@ const StoreAdminInsight: React.FC<Props> = ({ onNavigate, onLogout }) => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-extrabold">${(item * 52.5).toFixed(2)}</p>
+                  <p className="text-sm font-extrabold">{formatPrice(item * 52.5)}</p>
                   <span className="text-[9px] font-bold text-[#07883b] uppercase tracking-tighter">Completed</span>
                 </div>
               </div>

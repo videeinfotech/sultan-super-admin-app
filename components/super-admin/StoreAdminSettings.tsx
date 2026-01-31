@@ -62,12 +62,12 @@ const StoreAdminSettings: React.FC<Props> = ({ onNavigate, onLogout, storeId }) 
       await superAdminApi.updateStore(storeId, formData);
       setShowEditModal(false);
       fetchSettings();
-      showToast('Store settings updated', 'success');
+      showToast('success', 'Identity Updated: Store configuration has been successfully saved.');
     } catch (err: any) {
       if (err.errors) {
         setFieldErrors(err.errors);
       } else {
-        showToast(err.message || 'Operation failed', 'error');
+        showToast('failed', err.message || 'Configuration Error: Unable to synchronize store updates.');
       }
     }
   };
@@ -77,10 +77,10 @@ const StoreAdminSettings: React.FC<Props> = ({ onNavigate, onLogout, storeId }) 
     try {
       await superAdminApi.updateStore(storeId, { permissions });
       setShowPermissionsModal(false);
-      showToast('Permissions updated successfully!', 'success');
+      showToast('success', 'Permissions Synchronized: Governance settings have been updated.');
       fetchSettings();
     } catch (err: any) {
-      showToast(err.message || 'Operation failed', 'error');
+      showToast('failed', err.message || 'Governance Error: Unable to modify administrative permissions.');
     }
   };
 
@@ -105,10 +105,15 @@ const StoreAdminSettings: React.FC<Props> = ({ onNavigate, onLogout, storeId }) 
           <section>
             <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1 mb-3">Store Identity</p>
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex items-center gap-4">
-              <img src={data?.logo || 'https://via.placeholder.com/200'} className="size-16 rounded-2xl object-cover bg-gray-50 shrink-0" alt="" />
+              <img src={data?.logo || `https://picsum.photos/seed/store_${storeId}/200/200`} className="size-16 rounded-2xl object-cover bg-gray-50 shrink-0" alt="" />
               <div className="min-w-0">
                 <p className="font-black text-lg text-gray-900 dark:text-white truncate">{data?.name}</p>
                 <p className="text-[10px] text-primary font-black uppercase tracking-widest">ID: {data?.id} • Owner: {data?.owner_name}</p>
+                {data?.parent_store && (
+                  <p className="text-[10px] text-amber-600 font-bold uppercase tracking-tight mt-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-md inline-block">
+                    Parent Store: {data.parent_store.name}
+                  </p>
+                )}
               </div>
             </div>
           </section>

@@ -46,8 +46,10 @@ const SuperAdminProductDetail: React.FC<Props> = ({ productId, onBack }) => {
     );
   }
 
-  const product = data?.product || {};
-  const inventory = data?.inventory || [];
+  // Robust mapping to handle both nested and flat structures if needed, although backend is now flat
+  const productData = data || {};
+  const product = productData.product || productData;
+  const inventory = productData.store_inventory || productData.inventory || [];
 
   return (
     <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto pb-20">
@@ -89,7 +91,7 @@ const SuperAdminProductDetail: React.FC<Props> = ({ productId, onBack }) => {
         <section className="flex gap-4 p-4">
           <div className="flex-1 p-5 border border-[#dbdfe6] dark:border-gray-800 bg-white dark:bg-gray-800 rounded-2xl shadow-sm space-y-1">
             <div className="flex items-center gap-2 text-gray-400">
-              <span className="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+              <span className="material-symbols-outlined text-primary text-[20px]">inventory</span>
               <span className="text-[10px] font-black uppercase tracking-tighter">Total Stock</span>
             </div>
             <p className="text-3xl font-black text-gray-900 dark:text-white">{product.stock || 0}</p>
@@ -119,9 +121,9 @@ const SuperAdminProductDetail: React.FC<Props> = ({ productId, onBack }) => {
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-tighter">{item.location || 'Local Storage'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-black text-base text-gray-900 dark:text-white">{item.stock} Units</p>
-                    <p className={`text-[10px] font-black uppercase ${item.stock > 10 ? 'text-green-500' : 'text-red-500'}`}>
-                      {item.stock > 10 ? 'Healthy' : 'Critical'}
+                    <p className="font-black text-base text-gray-900 dark:text-white">{item.quantity} Units</p>
+                    <p className={`text-[10px] font-black uppercase ${item.quantity > 10 ? 'text-green-500' : 'text-red-500'}`}>
+                      {item.quantity > 10 ? 'Healthy' : 'Critical'}
                     </p>
                   </div>
                 </div>
@@ -132,9 +134,10 @@ const SuperAdminProductDetail: React.FC<Props> = ({ productId, onBack }) => {
 
         <section className="mt-8 px-4 pb-12">
           <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-4">Description</h3>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-[#dbdfe6] dark:border-gray-800 text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed shadow-sm">
-            {product.description || 'No description available for this product.'}
-          </div>
+          <div
+            className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-[#dbdfe6] dark:border-gray-800 text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed shadow-sm html-content"
+            dangerouslySetInnerHTML={{ __html: product.description || 'No description available for this product.' }}
+          />
         </section>
       </main>
 

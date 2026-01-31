@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { SuperAdminView, Order } from '../../types.ts';
-import { superAdminApi } from '../../api.ts';
+import { superAdminApi, formatPrice } from '../../api.ts';
 
 interface Props {
   onNavigate: (view: SuperAdminView, id?: string) => void;
@@ -11,14 +11,22 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
+  const [period, setPeriod] = useState('today');
+
+  const periods = [
+    { label: 'Today', value: 'today', icon: 'today' },
+    { label: 'Last 7 Days', value: 'last_7_days', icon: 'date_range' },
+    { label: 'Last 30 Days', value: 'last_30_days', icon: 'calendar_month' },
+    { label: 'This Month', value: 'this_month', icon: 'event_repeat' }
+  ];
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
         const [ordersRes, dashboardRes] = await Promise.all([
-          superAdminApi.getOrders(),
-          superAdminApi.getDashboard('?period=today')
+          superAdminApi.getOrders(`?period=${period}`),
+          superAdminApi.getDashboard(`?period=${period}`)
         ]);
 
         if (ordersRes.success) {
@@ -34,7 +42,7 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
       }
     };
     fetchOrders();
-  }, []);
+  }, [period]);
 
   return (
     <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto pb-20">
@@ -44,7 +52,31 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
             <span className="material-symbols-outlined">public</span>
           </div>
           <h2 className="text-lg font-bold flex-1 ml-3">Global Orders</h2>
-          <span className="material-symbols-outlined text-gray-400">notifications</span>
+          <button
+            onClick={() => alert('System notifications are synced with the main dashboard.')}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800"
+          >
+            <span className="material-symbols-outlined text-[20px] text-gray-500">notifications</span>
+          </button>
+        </div>
+        <div className="flex gap-3 px-4 py-3 overflow-x-auto no-scrollbar">
+          {periods.slice(0, 2).map((p) => (
+            <button
+              key={p.value}
+              onClick={() => setPeriod(p.value)}
+              className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-2xl px-4 text-xs font-black transition-all shadow-sm ${period === p.value ? 'bg-primary text-white shadow-primary/20' : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-500'}`}
+            >
+              <span>{p.label}</span>
+              <span className="material-symbols-outlined text-base">{p.icon}</span>
+            </button>
+          ))}
+          <button
+            onClick={() => setPeriod(period === 'last_30_days' ? 'today' : 'last_30_days')}
+            className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-2xl px-4 text-xs font-black transition-all bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-500`}
+          >
+            <span>Filters</span>
+            <span className="material-symbols-outlined text-base">tune</span>
+          </button>
         </div>
       </header>
 
@@ -59,7 +91,7 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
           </div>
           <div className="flex-1 p-4 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm">
             <p className="text-xs font-semibold text-[#616f89] uppercase">Total Revenue</p>
-            <p className="text-2xl font-bold">${stats?.total_revenue?.toLocaleString() || '...'}</p>
+            <p className="text-2xl font-bold">{formatPrice(stats?.total_revenue || 0)}</p>
             <p className={`text-xs font-bold mt-1 ${stats?.revenue_change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
               {stats?.revenue_change >= 0 ? '+' : ''}{stats?.revenue_change}%
             </p>
@@ -94,9 +126,9 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
                       <p className="text-xs text-[#616f89]">{order.timestamp}</p>
                     </div>
                     <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${['Completed', 'Delivered'].includes(order.status) ? 'bg-emerald-100 text-emerald-700' :
-                        ['Pending', 'Confirmed'].includes(order.status) ? 'bg-amber-100 text-amber-700' :
-                          ['In Transit', 'Out for Delivery'].includes(order.status) ? 'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-700'
+                      ['Pending', 'Confirmed'].includes(order.status) ? 'bg-amber-100 text-amber-700' :
+                        ['In Transit', 'Out for Delivery'].includes(order.status) ? 'bg-blue-100 text-blue-700' :
+                          'bg-gray-100 text-gray-700'
                       }`}>
                       {order.status}
                     </span>
@@ -106,7 +138,7 @@ const SuperAdminOrders: React.FC<Props> = ({ onNavigate }) => {
                     <p className="text-sm text-[#616f89]">Customer: {order.customer}</p>
                   </div>
                   <div className="flex justify-between items-center pt-2 mt-2 border-t dark:border-gray-800">
-                    <p className="text-lg font-extrabold text-primary">${typeof order.amount === 'number' ? order.amount.toFixed(2) : order.amount}</p>
+                    <p className="text-lg font-extrabold text-primary">{formatPrice(order.amount)}</p>
                     <div className="flex items-center text-[#616f89]">
                       <span className="text-xs font-medium mr-1">View Details</span>
                       <span className="material-symbols-outlined text-[18px]">chevron_right</span>
