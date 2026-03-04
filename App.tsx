@@ -47,12 +47,53 @@ const App: React.FC = () => {
     checkAuth();
   }, []);
 
+  // Handle mobile back button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.superView) {
+        setSuperView(event.state.superView);
+        if (event.state.id) {
+          if (event.state.superView === 'product-detail') setSelectedProductId(event.state.id);
+          if (event.state.superView === 'order-detail') setSelectedOrderId(event.state.id);
+          if (event.state.superView === 'store-insight') setSelectedStoreId(event.state.id);
+        }
+      } else {
+        setSuperView('dashboard');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Push initial state
+    if (!window.history.state) {
+      window.history.replaceState({ superView: 'dashboard' }, '');
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const navigateToSuper = (view: SuperAdminView, id?: string) => {
+    // Determine if this is a sub-tab navigation
+    const rootViews = ['dashboard', 'inventory', 'orders', 'analytics', 'store-directory', 'profile'];
+    const storeSubViews = ['store-insight', 'store-stock', 'store-staff', 'store-settings'];
+    const isRootNav = rootViews.includes(superView) && rootViews.includes(view);
+    const isSubNav = storeSubViews.includes(superView) && storeSubViews.includes(view);
+
     setSuperView(view);
     if (id) {
       if (view === 'product-detail') setSelectedProductId(id);
       if (view === 'order-detail') setSelectedOrderId(id);
       if (view === 'store-insight') setSelectedStoreId(id);
+    }
+
+    try {
+      if (isRootNav || isSubNav) {
+        window.history.replaceState({ superView: view, id: id || selectedStoreId }, '', `#${view}`);
+      } else {
+        window.history.pushState({ superView: view, id }, '', `#${view}`);
+      }
+    } catch (error) {
+      console.error('Error pushing history state:', error);
     }
   };
 
@@ -87,15 +128,15 @@ const App: React.FC = () => {
             <>
               {superView === 'dashboard' && <SuperAdminDashboard onNavigate={navigateToSuper} />}
               {superView === 'inventory' && <SuperAdminInventory onNavigate={navigateToSuper} />}
-              {superView === 'product-detail' && <SuperAdminProductDetail productId={selectedProductId} onBack={() => navigateToSuper('inventory')} />}
+              {superView === 'product-detail' && <SuperAdminProductDetail productId={selectedProductId} onBack={() => { if (window.history.length > 1) { window.history.back(); } else { navigateToSuper('inventory'); } }} />}
               {superView === 'orders' && <SuperAdminOrders onNavigate={navigateToSuper} />}
-              {superView === 'order-detail' && <SuperAdminOrderDetail orderId={selectedOrderId} onBack={() => navigateToSuper('orders')} />}
+              {superView === 'order-detail' && <SuperAdminOrderDetail orderId={selectedOrderId} onBack={() => { if (window.history.length > 1) { window.history.back(); } else { navigateToSuper('orders'); } }} />}
               {superView === 'analytics' && <SuperAdminAnalytics onNavigate={navigateToSuper} />}
               {superView === 'store-directory' && <SuperAdminStoreDirectory onNavigate={navigateToSuper} />}
-              {superView === 'profile' && <SuperAdminProfile onLogout={handleLogout} onBack={() => navigateToSuper('dashboard')} onNavigate={navigateToSuper} />}
+              {superView === 'profile' && <SuperAdminProfile onLogout={handleLogout} onBack={() => { if (window.history.length > 1) { window.history.back(); } else { navigateToSuper('dashboard'); } }} onNavigate={navigateToSuper} />}
 
               {/* Integrated Store Views */}
-              {superView === 'store-insight' && <StoreAdminInsight onNavigate={navigateToSuper} storeId={selectedStoreId} onBack={() => navigateToSuper('store-directory')} />}
+              {superView === 'store-insight' && <StoreAdminInsight onNavigate={navigateToSuper} storeId={selectedStoreId} onBack={() => { if (window.history.length > 1) { window.history.back(); } else { navigateToSuper('store-directory'); } }} />}
               {superView === 'store-stock' && <StoreAdminStock onNavigate={navigateToSuper} storeId={selectedStoreId} />}
               {superView === 'store-staff' && <StoreAdminStaff onNavigate={navigateToSuper} storeId={selectedStoreId} />}
               {superView === 'store-settings' && <StoreAdminSettings onNavigate={navigateToSuper} storeId={selectedStoreId} onLogout={handleLogout} />}
