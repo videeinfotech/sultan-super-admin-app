@@ -11,7 +11,7 @@ const isLocalhost = window.location.hostname === 'localhost' ||
 
 const BASE_URL = isLocalhost
   ? 'http://localhost:8000/api/v1'
-  : 'https://sultan.quicdeal.in/api/v1';
+  : 'https://super-admin.ardiamonds.ca/api/v1';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('super_admin_token');
